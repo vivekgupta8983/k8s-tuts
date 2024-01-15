@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+  labels:
+    app: nginx
+data: 
+   nginx.conf: |
+    # HTTP redirect
+    server {
+        listen      80;
+        listen      [::]:80;
+        server_name .example.com;
+        location / {
+            return 301 https://example.com$request_uri;
+        }
+    }
+
+

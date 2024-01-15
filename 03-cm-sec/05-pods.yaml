@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "nginx-sec"
+  namespace: default
+  labels:
+    app: "nginx-sec"
+spec:
+  containers:
+  - name: nginx
+    image: "devcloudgeek/devcloudgeek:nginx-latest"
+    ports:
+    - containerPort:  80
+      name:  http
+  imagePullSecrets:
+    - name: registry-secret
