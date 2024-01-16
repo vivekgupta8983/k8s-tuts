@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "podexample"
+  namespace: default
+  labels:
+    app: "podexample"
+spec:
+  containers:
+  - name: podexample
+    image: "debian-slim:latest"
+    resources:
+      limits:
+        cpu: 200m
+        memory: 500Mi
+      requests:
+        cpu: 100m
+        memory: 200Mi
+    ports:
+    - containerPort:  80
+      name:  http
+    volumeMounts:
+    - name: test
+      mountPath: /
+  volumes:
+    - name: test
+      persistentVolumeClaim: 
+            claimName: myscpvc
+  restartPolicy: Always
