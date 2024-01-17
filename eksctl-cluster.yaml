@@ -1,0 +1,60 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+availabilityZones:
+- us-east-1a
+- us-east-1b
+- us-east-1c
+
+metadata:
+  name: devcloudgeek-1-27
+  region: us-east-1
+  version: '1.27'
+  tags:
+    karpenter.sh/discovery: devcloudgeek-1-27
+    created-by: eksctl
+    env: devcloudgeek-1-27
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+    - metadata:
+        name: aws-load-balancer
+        namespace: kube-system
+      wellKnownPolicies:
+        awsLoadBalancerController: true  
+
+vpc:
+  cidr: 10.42.0.0/16
+  clusterEndpoints:
+    privateAccess: true
+    publicAccess: true
+
+addons:
+- name: vpc-cni
+  version: 1.14.1
+  configurationValues:  "{\"env\":{\"ENABLE_PREFIX_DELEGATION\":\"true\", \"ENABLE_POD_ENI\":\"true\", \"POD_SECURITY_GROUP_ENFORCING_MODE\":\"standard\"},\"enableNetworkPolicy\": \"true\"}"
+  resolveConflicts: overwrite
+
+- name: aws-ebs-csi-driver
+  wellKnownPolicies:      # add IAM and service account
+    ebsCSIController: true
+
+managedNodeGroups:
+- name: default
+  desiredCapacity: 2
+  minSize: 2
+  maxSize: 4
+  instanceType: t3.medium
+  privateNetworking: true
+  iam:
+    withAddonPolicies:
+      imageBuilder: true # Add permission for ECR Images
+      albIngress: true  # Add permission for ALB Ingress
+      autoScaler: true # Add permission Auto Scaling
+      ebs: true # Add permission EBS CSI driver
+  updateConfig:
+    maxUnavailablePercentage: 50
+  labels:
+    workshop-default: 'yes'
+   
